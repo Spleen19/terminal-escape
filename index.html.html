@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Terminal - Escape Game Progression</title>
+  <style>
+    body {
+      background-color: black;
+      color: #ffd700;
+      font-family: "Courier New", Courier, monospace;
+      padding: 20px;
+    }
+    #terminal {
+      width: 100%;
+      height: 80vh;
+      overflow-y: auto;
+      border: 1px solid #ffd700;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+    #input-line {
+      display: flex;
+      margin-top: 10px;
+      display: none;
+    }
+    #prompt {
+      margin-right: 5px;
+    }
+    input {
+      background: black;
+      border: none;
+      color: #ffd700;
+      font-family: inherit;
+      font-size: 16px;
+      width: 100%;
+      outline: none;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>🧠 Terminal de Décryptage - Escape Game</h2>
+  <div id="terminal"></div>
+  <div id="input-line">
+    <span id="prompt">>_</span>
+    <input type="text" id="command" autofocus autocomplete="off" />
+  </div>
+
+  <script>
+    const terminal = document.getElementById("terminal");
+    const input = document.getElementById("command");
+    const inputLine = document.getElementById("input-line");
+
+    const introLines = [
+      "Connexion au serveur sécurisé...",
+      "Authentification en cours...",
+      "Bypass du pare-feu...",
+      "Accès root obtenu...",
+      "Chargement de l'interface du jeu..."
+    ];
+
+    const enigmes = [
+      {
+        question: "Énigme 1 : J’ai des clés mais pas de serrure, j’ai de l’espace mais pas de pièce, on me tape mais je ne ressens rien. Qui suis-je ?",
+        reponse: "clavier",
+        code: "<strong>Code 1 débloqué : GOURMAND</strong>"
+      },
+      {
+        question: "Énigme 2 : Je fais le tour du monde sans bouger. Qui suis-je ?",
+        reponse: "timbre",
+        code: "<strong>Code 2 débloqué : GEEK</strong>"
+      },
+      {
+        question: "Énigme 3 : Plus je sèche, plus je deviens mouillé. Que suis-je ?",
+        reponse: "serviette",
+        code: "<strong>Code 3 débloqué : PAS-DROLE</strong>"
+      },
+      {
+        question: "Énigme 4 : Je peux te sauver ou te trahir. Je peux être dur ou doux. Que suis-je ?",
+        reponse: "mot",
+        code: "<strong>Code 4 débloqué : BEAU-GOSSE</strong>"
+      }
+    ];
+
+    let currentStep = 0;
+
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        const cmd = input.value.trim().toLowerCase();
+        addLine(">_ " + cmd);
+        processCommand(cmd);
+        input.value = "";
+      }
+    });
+
+    function addLine(text) {
+      const p = document.createElement("p");
+      p.innerHTML = text;
+      terminal.appendChild(p);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function processCommand(cmd) {
+      if (cmd === "help") {
+        if (currentStep < enigmes.length) {
+          addLine(`Commande disponible : enigme${currentStep + 1}`);
+        } else {
+          addLine("✅ Toutes les énigmes résolues ! Tape 'final' pour révéler le message secret.");
+        }
+      } else if (cmd === `enigme${currentStep + 1}`) {
+        addLine(enigmes[currentStep].question);
+      } else if (cmd === "final") {
+        if (currentStep === enigmes.length) {
+          addLine("🔓 <strong>FÉLICITATIONS TU ES VENU A BOUT DE CES ÉNIGMES !</strong>");
+          addLine("<strong>Mot de passe final : INDICE3</strong>");
+          addLine("Fin de transmission. 🛡️");
+        } else {
+          addLine("⛔ Tu n'as pas encore terminé toutes les énigmes.");
+        }
+      } else if (cmd === "clear") {
+        terminal.innerHTML = "<p>Terminal nettoyé.</p>";
+      } else {
+        if (currentStep < enigmes.length && cmd === enigmes[currentStep].reponse) {
+          addLine("✅ Bonne réponse !");
+          addLine(enigmes[currentStep].code);
+          currentStep++;
+          if (currentStep < enigmes.length) {
+            addLine(`Tape "help" pour débloquer la suite...`);
+          } else {
+            addLine("🎉 Toutes les énigmes ont été résolues !");
+            addLine("Tape 'final' pour révéler le message de fin.");
+          }
+        } else {
+          addLine("Commande inconnue ou mauvaise réponse. Tape 'help' pour voir ce que tu peux faire.");
+        }
+      }
+    }
+
+    async function startIntro() {
+      for (let line of introLines) {
+        addLine(line);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      addLine("Bienvenue, je te propose un nouveau jeu. Tape 'help' pour commencer ta mission.");
+      inputLine.style.display = "flex";
+    }
+
+    startIntro();
+  </script>
+</body>
+</html>
